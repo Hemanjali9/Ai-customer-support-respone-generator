@@ -1,5 +1,8 @@
-# Ai-customer-support-respone-generator
-AI-powered customer support platform that generates policy-compliant responses, detects escalations, manages tickets, and streamlines customer service workflows through automation, analytics, and intelligent response generation.
+# AI Customer Support Response Generator Pro
+
+An enterprise-grade, full-stack AI-powered Customer Support Response Platform. Designed to help support agents instantly draft professional, empathetic, and company-policy-compliant customer service responses using Groq's `llama-3.1-8b-instant` LLM. Features automated compliance checks, keyword-based escalations for legal/abuse flags, a manager approval flow, and an administrative analytics dashboard.
+
+---
 
 ## Folder Structure
 

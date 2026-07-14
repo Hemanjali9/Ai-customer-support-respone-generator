@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Support Response Generator Pro</title>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- GLOBAL LOADING OVERLAY -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loader-box">
+      <div class="neon-spinner"></div>
+      <p id="loading-text">Processing request...</p>
+    </div>
+  </div>
+
+  <!-- LOGOUT CONFIRMATION MODAL -->
+  <div id="logout-modal" class="modal hidden">
+    <div class="modal-content glass-card neon-border-danger">
+      <div class="modal-header">
+        <h2>Confirm Logout</h2>
+        <button class="close-btn" onclick="closeLogoutModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to logout from the platform?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeLogoutModal()">Cancel</button>
+        <button id="confirm-logout-btn" class="btn btn-danger">Yes, Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASE DETAILS MODAL -->
+  <div id="case-modal" class="modal hidden">
+    <div class="modal-content glass-card large-modal neon-border-primary">
+      <div class="modal-header">
+        <h2 id="modal-title">Case Details</h2>
+        <button class="close-btn" onclick="closeCaseModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-case-body">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-footer" id="modal-case-footer">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div id="app-container" class="app-container">
+
+    <!-- NAVIGATION SIDEBAR (Visible for Logged In Users) -->
+    <aside id="app-sidebar" class="sidebar hidden">
+      <div class="sidebar-brand">
+        <i class="fa-solid fa-robot neon-text"></i>
+        <span>AI SUPPORT <span class="accent-text">PRO</span></span>
+      </div>
+      
+      <div class="user-profile-badge">
+        <div class="avatar"><i class="fa-solid fa-user-shield"></i></div>
+        <div class="user-info">
+          <h4 id="sidebar-user-name">John Doe</h4>
+          <span id="sidebar-user-role" class="badge-role">Agent</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Agent Links -->
+        <div id="nav-agent-links" class="nav-group hidden">
+          <a href="#agent-dashboard" class="nav-link" id="link-agent-dashboard">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard
+          </a>
+          <a href="#generate-response" class="nav-link" id="link-generate-response">
+            <i class="fa-solid fa-file-signature"></i> New Response
+          </a>
+          <a href="#my-cases" class="nav-link" id="link-my-cases">
+            <i class="fa-solid fa-folder-open"></i> My Cases
+          </a>
+        </div>
+
+        <!-- Manager Links -->
+        <div id="nav-manager-links" class="nav-group hidden">
+          <a href="#manager-dashboard" class="nav-link" id="link-manager-dashboard">
+            <i class="fa-solid fa-chart-pie"></i> Dashboard
+          </a>
+          <a href="#escalated-cases" class="nav-link" id="link-escalated-cases">
+            <i class="fa-solid fa-triangle-exclamation"></i> Escalated Cases
+          </a>
+        </div>
+
+        <!-- Admin Links -->
+        <div id="nav-admin-links" class="nav-group hidden">
+          <a href="#admin-dashboard" class="nav-link" id="link-admin-dashboard">
+            <i class="fa-solid fa-chart-line"></i> Analytics Dashboard
+          </a>
+          <a href="#users-management" class="nav-link" id="link-users-management">
+            <i class="fa-solid fa-users-gear"></i> Manage Users
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" id="sidebar-logout-btn">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEWS CONTAINER -->
+    <main id="view-container" class="main-content">
+      
+      <!-- 1. LANDING PAGE -->
+      <section id="view-landing" class="view">
+        <div class="landing-hero">
+          <div class="neon-glow-circle"></div>
+          <h1 class="landing-title">AI Customer Support <br><span class="neon-text">Response Generator Pro</span></h1>
+          <p class="landing-subtitle">Generate policy-compliant, professional customer service letters using Groq Llama-3.1 AI. Integrated manager approval loop and admin analytics.</p>
+          <div class="landing-cta">
+            <a href="#login" class="btn btn-primary btn-lg">Get Started <i class="fa-solid fa-arrow-right"></i></a>
+            <a href="#register" class="btn btn-secondary btn-lg">Create Account</a>
+          </div>
+          <div class="landing-features">
+            <div class="feature-card glass-card">
+              <i class="fa-solid fa-shield-halved"></i>
+              <h3>Policy Engine</h3>
+              <p>Strict guardrails verify timelines, refund percentages, and terms before response issuance.</p>
+            </div>
+            <div class="feature-card glass-card">
+              <i class="fa-solid fa-route"></i>
+              <h3>Auto Escalations</h3>
+              <p>Triggers immediate manager review for abuse, legal vocabulary, or high transaction amounts.</p>
+            </div>
+            <div class="feature-card glass-card">
+              <i class="fa-solid fa-bolt"></i>
+              <h3>Groq Llama-3.1</h3>
+              <p>Lightning fast customer support letters customized with tone templates in milliseconds.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. LOGIN PAGE -->
+      <section id="view-login" class="view hidden">
+        <div class="auth-wrapper">
+          <div class="glass-card auth-card neon-border-primary">
+            <div class="auth-header">
+              <h2>Welcome Back</h2>
+              <p>Sign in to access your role-based workspace</p>
+            </div>
+            <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+              <div class="form-group">
+                <label for="login-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" id="login-email" placeholder="agent@company.com" required>
+              </div>
+              <div class="form-group">
+                <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                <div class="password-input-wrapper">
+                  <input type="password" id="login-password" placeholder="••••••••" required>
+                  <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('login-password')">
+                    <i class="fa-solid fa-eye" id="login-password-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-actions-row">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="login-remember">
+                  <span class="checkmark"></span>
+                  Remember Me
+                </label>
+                <a href="#forgot" class="forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </form>
+            <div class="auth-footer">
+              <p>New to platform? <a href="#register">Register Here</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. REGISTER PAGE -->
+      <section id="view-register" class="view hidden">
+        <div class="auth-wrapper">
+          <div class="glass-card auth-card neon-border-secondary">
+            <div class="auth-header">
+              <h2>Register Account</h2>
+              <p>Create a secure role-based support profile</p>
+            </div>
+            <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+              <div class="form-group">
+                <label for="reg-name"><i class="fa-solid fa-user"></i> Full Name</label>
+                <input type="text" id="reg-name" placeholder="John Agent" required>
+              </div>
+              <div class="form-group">
+                <label for="reg-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                <input type="email" id="reg-email" placeholder="user@company.com" required>
+              </div>
+              <div class="form-group">
+                <label for="reg-role"><i class="fa-solid fa-user-tag"></i> Profile Role</label>
+                <select id="reg-role" class="form-select" required>
+                  <option value="Agent">Support Agent</option>
+                  <option value="Manager">Support Manager</option>
+                  <option value="Admin">System Administrator</option>
+                </select>
+              </div>
+              
+              <!-- Password Input -->
+              <div class="form-group">
+                <label for="reg-password"><i class="fa-solid fa-lock"></i> Password</label>
+                <div class="password-input-wrapper">
+                  <input type="password" id="reg-password" placeholder="••••••••" required oninput="validatePasswordRules()">
+                  <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-password')">
+                    <i class="fa-solid fa-eye" id="reg-password-eye"></i>
+                  </button>
+                </div>
+                
+                <!-- Password Validation Indicators -->
+                <div class="password-rules-box">
+                  <div class="rule-item" id="rule-length"><i class="fa-solid fa-circle-xmark"></i> Minimum 8 characters</div>
+                  <div class="rule-item" id="rule-upper"><i class="fa-solid fa-circle-xmark"></i> 1 uppercase letter</div>
+                  <div class="rule-item" id="rule-lower"><i class="fa-solid fa-circle-xmark"></i> 1 lowercase letter</div>
+                  <div class="rule-item" id="rule-number"><i class="fa-solid fa-circle-xmark"></i> 1 number</div>
+                  <div class="rule-item" id="rule-special"><i class="fa-solid fa-circle-xmark"></i> 1 special character</div>
+                </div>
+              </div>
+
+              <!-- Confirm Password Input -->
+              <div class="form-group">
+                <label for="reg-confirm-password"><i class="fa-solid fa-circle-check"></i> Confirm Password</label>
+                <div class="password-input-wrapper">
+                  <input type="password" id="reg-confirm-password" placeholder="••••••••" required oninput="validatePasswordRules()">
+                  <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('reg-confirm-password')">
+                    <i class="fa-solid fa-eye" id="reg-confirm-password-eye"></i>
+                  </button>
+                </div>
+                <div class="rule-item mt-1" id="rule-match"><i class="fa-solid fa-circle-xmark"></i> Passwords must match</div>
+              </div>
+
+              <button type="submit" id="register-submit-btn" class="btn btn-secondary btn-block" disabled>Register Profile</button>
+            </form>
+            <div class="auth-footer">
+              <p>Already registered? <a href="#login">Login Here</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. AGENT DASHBOARD -->
+      <section id="view-agent-dashboard" class="view hidden">
+        <div class="dashboard-header">
+          <h1>Agent Workspace</h1>
+          <p>Overview of your generated support activities</p>
+        </div>
+        
+        <!-- AGENT CARDS -->
+        <div class="dashboard-grid">
+          <div class="stats-card glass-card neon-border-primary">
+            <div class="card-icon"><i class="fa-solid fa-folder-open"></i></div>
+            <div class="card-info">
+              <h3>My Cases</h3>
+              <p id="agent-stat-total-cases" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-success">
+            <div class="card-icon"><i class="fa-solid fa-file-circle-check"></i></div>
+            <div class="card-info">
+              <h3>Generated Responses</h3>
+              <p id="agent-stat-generated" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-warning">
+            <div class="card-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="card-info">
+              <h3>Escalated Cases</h3>
+              <p id="agent-stat-escalated" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-secondary">
+            <div class="card-icon"><i class="fa-solid fa-spinner"></i></div>
+            <div class="card-info">
+              <h3>Pending Cases</h3>
+              <p id="agent-stat-pending" class="stat-number">0</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="agent-actions-row mt-4">
+          <a href="#generate-response" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Generate Response</a>
+          <a href="#my-cases" class="btn btn-secondary"><i class="fa-solid fa-list"></i> View My Cases</a>
+        </div>
+
+        <!-- NOTIFICATIONS SECTION -->
+        <div class="dashboard-section-row mt-4">
+          <div class="glass-card full-width-card">
+            <div class="section-title">
+              <h2>Recent Notification Alerts</h2>
+            </div>
+            <div class="notifications-list" id="agent-notifications-list">
+              <p class="empty-state">No new notifications.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. GENERATE RESPONSE PAGE (AGENT FORM) -->
+      <section id="view-generate-response" class="view hidden">
+        <div class="dashboard-header">
+          <h1>New Support Response</h1>
+          <p>Input customer ticket information to compose or escalate support answers</p>
+        </div>
+
+        <div class="form-response-split">
+          <!-- INPUT FORM -->
+          <div class="glass-card form-column">
+            <h2>Complaint Parameters</h2>
+            <form id="response-generator-form" class="mt-3" onsubmit="handleGenerateResponse(event)">
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="case-cust-name">Customer Name</label>
+                  <input type="text" id="case-cust-name" placeholder="Alice Smith" required>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="case-cust-email">Customer Email</label>
+                  <input type="email" id="case-cust-email" placeholder="alice@example.com" required>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="case-order-id">Order ID</label>
+                  <input type="text" id="case-order-id" placeholder="ORD-998877" required>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="case-amount">Order Amount (₹)</label>
+                  <input type="number" id="case-amount" placeholder="1250" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="case-category">Issue Category</label>
+                <select id="case-category" class="form-select" required onchange="updateCategoryGuidelines()">
+                  <option value="" disabled selected>Select Category</option>
+                  <option value="Order Delayed">1. Order Delayed</option>
+                  <option value="Wrong Item Received">2. Wrong Item Received</option>
+                  <option value="Damaged Product">3. Damaged Product</option>
+                  <option value="Refund Not Processed">4. Refund Not Processed</option>
+                  <option value="Payment Failed but Amount Deducted">5. Payment Failed but Amount Deducted</option>
+                  <option value="Return Request">6. Return Request</option>
+                  <option value="Cancellation Request">7. Cancellation Request</option>
+                  <option value="Coupon Not Working">8. Coupon Not Working</option>
+                  <option value="Account Access Issue">9. Account Access Issue</option>
+                  <option value="General Inquiry">10. General Inquiry</option>
+                </select>
+              </div>
+
+              <!-- DYNAMIC POLICY/TEMPLATE GUIDELINE BOX -->
+              <div id="category-guideline-box" class="guidelines-card hidden">
+                <h4><i class="fa-solid fa-circle-info"></i> Category Policy Requirements</h4>
+                <p id="guideline-policy-points"></p>
+                <div class="guideline-sub"><span class="highlight">Tone:</span> <span id="guideline-tone"></span></div>
+                <div class="guideline-sub"><span class="highlight">Required fields:</span> <span id="guideline-required"></span></div>
+              </div>
+
+              <div class="form-group">
+                <label for="case-complaint">Complaint Details</label>
+                <textarea id="case-complaint" rows="5" placeholder="Paste customer's exact complaint text here..." required></textarea>
+              </div>
+              <div class="form-group">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="case-repeated">
+                  <span class="checkmark"></span>
+                  Repeated Complaint Checkbox
+                </label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate Response</button>
+            </form>
+          </div>
+
+          <!-- RESPONSE GENERATED PREVIEW & SAVE -->
+          <div class="glass-card preview-column flex-1">
+            <h2>AI Response draft</h2>
+            
+            <!-- ESCALATION WARNING BOX -->
+            <div id="escalation-warning" class="warning-banner hidden">
+              <div class="warning-header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h3>Needs Manager Review</h3>
+              </div>
+              <p id="escalation-reason-text" class="mt-2"></p>
+              <div class="mt-3">
+                <span class="badge badge-danger">Escalated</span>
+              </div>
+            </div>
+
+            <!-- NORMAL DRAFT VIEW -->
+            <div id="draft-output-container" class="draft-container mt-3">
+              <div class="quality-checklist-box hidden" id="quality-checker-box">
+                <h4>Quality Verification Checklist</h4>
+                <div class="checklist-grid">
+                  <div class="check-item" id="check-cust-name"><i class="fa-solid fa-circle-xmark"></i> Customer Name</div>
+                  <div class="check-item" id="check-order-id"><i class="fa-solid fa-circle-xmark"></i> Order ID</div>
+                  <div class="check-item" id="check-timelines"><i class="fa-solid fa-circle-xmark"></i> Timelines Mentioned</div>
+                  <div class="check-item" id="check-polite"><i class="fa-solid fa-circle-xmark"></i> Polite & Professional Tone</div>
+                  <div class="check-item" id="check-instant"><i class="fa-solid fa-circle-xmark"></i> No Instant Refund Promise</div>
+                </div>
+              </div>
+
+              <div class="form-group mt-3">
+                <label for="generated-response-text">Generated Response Editor</label>
+                <textarea id="generated-response-text" class="generated-textarea" rows="12" placeholder="AI support generation output will display here. You can manually edit the text before saving."></textarea>
+              </div>
+
+              <!-- ACTION BUTTONS -->
+              <div class="draft-actions-row">
+                <button type="button" class="btn btn-secondary flex-1" onclick="copyDraftToClipboard()" id="btn-copy-draft" disabled>
+                  <i class="fa-solid fa-copy"></i> Copy
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="downloadDraftAsTxt()" id="btn-download-txt" disabled>
+                  <i class="fa-solid fa-file-arrow-down"></i> TXT
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="downloadDraftAsPdf()" id="btn-download-pdf" disabled>
+                  <i class="fa-solid fa-file-pdf"></i> PDF
+                </button>
+                <button type="button" class="btn btn-success flex-1" onclick="submitCaseToManager()" id="btn-save-case" disabled>
+                  <i class="fa-solid fa-floppy-disk"></i> Save & Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. MY CASES LIST (AGENT VIEW) -->
+      <section id="view-my-cases" class="view hidden">
+        <div class="dashboard-header">
+          <h1>My Support Cases</h1>
+          <p>History of customer cases generated under your account</p>
+        </div>
+
+        <div class="glass-card full-width-card mt-3">
+          <!-- FILTERS & SEARCH ROW -->
+          <div class="filters-row">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="agent-search-query" placeholder="Search by customer name or Order ID..." oninput="filterAgentCases()">
+            </div>
+            
+            <div class="filter-controls">
+              <select id="agent-filter-category" class="filter-select" onchange="filterAgentCases()">
+                <option value="">All Categories</option>
+                <option value="Order Delayed">Order Delayed</option>
+                <option value="Wrong Item Received">Wrong Item Received</option>
+                <option value="Damaged Product">Damaged Product</option>
+                <option value="Refund Not Processed">Refund Not Processed</option>
+                <option value="Payment Failed but Amount Deducted">Payment Failed but Amount Deducted</option>
+                <option value="Return Request">Return Request</option>
+                <option value="Cancellation Request">Cancellation Request</option>
+                <option value="Coupon Not Working">Coupon Not Working</option>
+                <option value="Account Access Issue">Account Access Issue</option>
+                <option value="General Inquiry">General Inquiry</option>
+              </select>
+
+              <select id="agent-filter-status" class="filter-select" onchange="filterAgentCases()">
+                <option value="">All Statuses</option>
+                <option value="Generated">Generated</option>
+                <option value="Pending">Pending</option>
+                <option value="Escalated">Escalated</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- CASES TABLE -->
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Name</th>
+                  <th>Category</th>
+                  <th>Amount (₹)</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="agent-cases-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+          <div class="table-pagination-info" id="agent-cases-pagination-info">
+            <!-- Dynamic info -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. MANAGER DASHBOARD -->
+      <section id="view-manager-dashboard" class="view hidden">
+        <div class="dashboard-header">
+          <h1>Manager Dashboard</h1>
+          <p>Monitor cases requiring manager review and intervention</p>
+        </div>
+
+        <!-- MANAGER CARDS -->
+        <div class="dashboard-grid">
+          <div class="stats-card glass-card neon-border-warning">
+            <div class="card-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="card-info">
+              <h3>Escalated Cases</h3>
+              <p id="manager-stat-escalated" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-secondary">
+            <div class="card-icon"><i class="fa-solid fa-spinner"></i></div>
+            <div class="card-info">
+              <h3>Pending Review</h3>
+              <p id="manager-stat-pending" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-success">
+            <div class="card-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="card-info">
+              <h3>Approved Cases</h3>
+              <p id="manager-stat-approved" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-danger">
+            <div class="card-icon"><i class="fa-solid fa-circle-xmark"></i></div>
+            <div class="card-info">
+              <h3>Rejected Cases</h3>
+              <p id="manager-stat-rejected" class="stat-number">0</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="manager-actions-row mt-4">
+          <a href="#escalated-cases" class="btn btn-primary"><i class="fa-solid fa-clipboard-list"></i> Review Escalated & Pending Cases</a>
+        </div>
+
+        <!-- NOTIFICATIONS SECTION -->
+        <div class="dashboard-section-row mt-4">
+          <div class="glass-card full-width-card">
+            <div class="section-title">
+              <h2>Recent Manager Alert Notifications</h2>
+            </div>
+            <div class="notifications-list" id="manager-notifications-list">
+              <p class="empty-state">No new notifications.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. ESCALATED CASES LIST (MANAGER VIEW) -->
+      <section id="view-escalated-cases" class="view hidden">
+        <div class="dashboard-header">
+          <h1>Escalated & Pending cases</h1>
+          <p>Review and decide approvals or rejections on customer service replies</p>
+        </div>
+
+        <div class="glass-card full-width-card mt-3">
+          <!-- SEARCH & FILTER -->
+          <div class="filters-row">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="manager-search-query" placeholder="Search by customer name or Order ID..." oninput="filterManagerCases()">
+            </div>
+            
+            <div class="filter-controls">
+              <select id="manager-filter-category" class="filter-select" onchange="filterManagerCases()">
+                <option value="">All Categories</option>
+                <option value="Order Delayed">Order Delayed</option>
+                <option value="Wrong Item Received">Wrong Item Received</option>
+                <option value="Damaged Product">Damaged Product</option>
+                <option value="Refund Not Processed">Refund Not Processed</option>
+                <option value="Payment Failed but Amount Deducted">Payment Failed but Amount Deducted</option>
+                <option value="Return Request">Return Request</option>
+                <option value="Cancellation Request">Cancellation Request</option>
+                <option value="Coupon Not Working">Coupon Not Working</option>
+                <option value="Account Access Issue">Account Access Issue</option>
+                <option value="General Inquiry">General Inquiry</option>
+              </select>
+
+              <select id="manager-filter-status" class="filter-select" onchange="filterManagerCases()">
+                <option value="">All Review Statuses</option>
+                <option value="Escalated">Escalated</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- TABLE -->
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer Name</th>
+                  <th>Category</th>
+                  <th>Amount (₹)</th>
+                  <th>Status</th>
+                  <th>Escalation/Submission Details</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="manager-cases-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. ADMIN DASHBOARD -->
+      <section id="view-admin-dashboard" class="view hidden">
+        <div class="dashboard-header">
+          <h1>Admin Analytics Panel</h1>
+          <p>System-wide diagnostics, metrics, and role configurations</p>
+        </div>
+
+        <!-- ADMIN CARDS -->
+        <div class="dashboard-grid">
+          <div class="stats-card glass-card neon-border-primary">
+            <div class="card-icon"><i class="fa-solid fa-users"></i></div>
+            <div class="card-info">
+              <h3>Total Users</h3>
+              <p id="admin-stat-total-users" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-success">
+            <div class="card-icon"><i class="fa-solid fa-briefcase"></i></div>
+            <div class="card-info">
+              <h3>Total Cases</h3>
+              <p id="admin-stat-total-cases" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-warning">
+            <div class="card-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="card-info">
+              <h3>Escalated</h3>
+              <p id="admin-stat-escalated" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-success">
+            <div class="card-icon"><i class="fa-solid fa-square-check"></i></div>
+            <div class="card-info">
+              <h3>Approved</h3>
+              <p id="admin-stat-approved" class="stat-number">0</p>
+            </div>
+          </div>
+          <div class="stats-card glass-card neon-border-danger">
+            <div class="card-icon"><i class="fa-solid fa-square-minus"></i></div>
+            <div class="card-info">
+              <h3>Rejected</h3>
+              <p id="admin-stat-rejected" class="stat-number">0</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHARTS SECTION -->
+        <div class="charts-container mt-4">
+          <div class="glass-card chart-card flex-1">
+            <h3>Cases by Category</h3>
+            <div class="chart-wrapper">
+              <canvas id="chart-cases-category"></canvas>
+            </div>
+          </div>
+          
+          <div class="glass-card chart-card flex-1">
+            <h3>Escalation Trends</h3>
+            <div class="chart-wrapper">
+              <canvas id="chart-escalation-trends"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-container mt-4">
+          <div class="glass-card chart-card flex-1">
+            <h3>Monthly Volume Trends</h3>
+            <div class="chart-wrapper">
+              <canvas id="chart-monthly-cases"></canvas>
+            </div>
+          </div>
+
+          <div class="glass-card chart-card flex-1">
+            <h3>Resolution Status Distribution</h3>
+            <div class="chart-wrapper">
+              <canvas id="chart-resolution-stats"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-actions-row mt-4">
+          <a href="#users-management" class="btn btn-secondary"><i class="fa-solid fa-users-cog"></i> Go To User Role Management</a>
+        </div>
+      </section>
+
+      <!-- 10. USERS MANAGEMENT PAGE (ADMIN ONLY) -->
+      <section id="view-users-management" class="view hidden">
+        <div class="dashboard-header">
+          <h1>User Profile Administration</h1>
+          <p>Assign roles and verify platform register permissions</p>
+        </div>
+
+        <div class="glass-card full-width-card mt-3">
+          <h2>Active Users List</h2>
+          <div class="table-responsive mt-3">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Registered Date</th>
+                  <th>Current Role</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body">
+                <!-- Loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Vanilla JS client logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>
